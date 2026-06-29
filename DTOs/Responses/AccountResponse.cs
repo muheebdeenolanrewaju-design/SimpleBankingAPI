@@ -1,0 +1,10 @@
+namespace SimpleBankingApi.DTOs.Responses;
+
+public class AccountResponse
+{
+    public string AccountNumber { get; set; }
+    public string CustomerName { get; set; }
+    public decimal Balance { get; set; }
+    public string Email { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
