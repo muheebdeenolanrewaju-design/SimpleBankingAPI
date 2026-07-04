@@ -1,5 +1,5 @@
 
-using BankAPI.Utilities;
+
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -66,16 +66,72 @@ public class EmailService:IEmailService
     
     public async Task SendWelcomeEmailAsync(string toEmail, string customerName, string accountNumber, decimal balance)
     {
-        var subject = "Welcome to Simple Baanking API!";
+        var subject = "Welcome to International African Bank!";
         
-        var htmlbody = MailUtils.GetWelcomeEmailHtml(customerName, accountNumber, balance);
+        var htmlbody = EmailTemplateGenerator.GetWelcomeEmailHtml(customerName, accountNumber, balance);
         
         var message = CreateBaseMessage(toEmail, subject);
         message.Body = new TextPart(TextFormat.Html) { Text = htmlbody };
         
         await SendMimeMessageAsync(message);
         
-        
-        
+    }
+    
+    //(string toEmail,string customerName,string accountNumber,decimal newBalance,decimal depositAmount, string reference);
+    public async Task SendDepositEmailAsync(string toEmail, string customerName, string accountNumber, decimal newBalance, decimal depositAmount,
+        string reference)
+    {
+        var subject = "Transaction Alert: Credit [Deposit]";
+        var htmlBody = EmailTemplateGenerator.GetDepositAlertEmailHtml(customerName,accountNumber,depositAmount,newBalance,reference);
+        var message = CreateBaseMessage(toEmail, subject);
+        message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+        await SendMimeMessageAsync(message);
+    }
+
+    public async Task SendWithdrawalEmailAsync(string toEmail, string customerName, string accountNumber, decimal newBalance, decimal withdrawalAmount,
+        string reference)
+    {
+        var subject = "Transaction Alert: Debit [Withdrawal]";
+        var htmlBody = EmailTemplateGenerator.GetWithdrawalAlertEmailHtml(customerName,accountNumber,withdrawalAmount,newBalance,reference);
+        var message = CreateBaseMessage(toEmail, subject);
+        message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+        await SendMimeMessageAsync(message);
+    }
+
+    public async Task SendTransferDebitEmailAsync(string toEmail, string customerName, string senderAccountNumber,
+        string recieverAccountNumber, decimal newBalance, decimal transferAmount, string reference)
+    {
+        var subject = "Transaction Alert: Debit [Transfer]";
+        var htmlBody = EmailTemplateGenerator.GetTransferDebitAlertEmailHtml(customerName,senderAccountNumber,recieverAccountNumber,transferAmount,newBalance,reference);
+        var message = CreateBaseMessage(toEmail, subject);
+        message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+        await SendMimeMessageAsync(message);
+    }
+
+    public async Task SendTransferCreditEmailAsync(string toEmail, string customerName, string senderAccountNumber,
+        string recieverAccountNumber, decimal newBalance, decimal transferAmount, string reference)
+    {
+        var subject = "Transaction Alert: Credit [Transfer]";
+        var htmlBody = EmailTemplateGenerator.GetTransferCreditAlertEmailHtml(customerName,senderAccountNumber,recieverAccountNumber,transferAmount,newBalance,reference);
+        var message = CreateBaseMessage(toEmail, subject);
+        message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+        await SendMimeMessageAsync(message);
+    }
+
+    public async Task SendDeactivationEmailAsync(string toEmail, string customerName, string accountNumber)
+    {
+        // 1. Set the correct subject line
+        var subject = "Account Deactivation Notification";
+    
+        // 2. Generate the HTML body content from our template utility
+        var htmlBody = EmailTemplateGenerator.GetDeactivationEmailHtml(customerName, accountNumber);
+    
+        // 3. Construct the base MIME message layout
+        var message = CreateBaseMessage(toEmail, subject);
+        message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+    
+        // 4. Dispatch the SMTP transmission securely
+        await SendMimeMessageAsync(message);
     }
 }
+    
